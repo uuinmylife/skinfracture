@@ -89,14 +89,8 @@
       transition: transform 0.05s;
     }
 
-    /* 많은 눈 */
     .eye {
       position: absolute;
-      width: 20px;
-      height: 20px;
-      background: white;
-      border: 2px solid black;
-      border-radius: 50%;
       pointer-events: none;
     }
   </style>
@@ -110,20 +104,24 @@
   <div class="noise"></div>
 
   <img src="character.png" class="character" id="character">
-
   <audio id="scream" src="scream.mp3"></audio>
 
   <script>
-    const images = ['blood1.png', 'blood2.png', 'eye.png'];
+    const bloodImages = ['blood1.png','blood2.png','eye.png'];
+    const eyeImages = ['eye1.png','eye2.png','eye3.png','eye4.png','eye5.png'];
 
-    // 눈 생성
+    // 사람 눈 여러 개 생성
     const eyeCount = 50;
     const eyes = [];
     for(let i=0; i<eyeCount; i++){
-      const eye = document.createElement('div');
+      const eye = document.createElement('img');
+      eye.src = eyeImages[Math.floor(Math.random()*eyeImages.length)];
       eye.className = 'eye';
-      eye.style.top = Math.random() * window.innerHeight + 'px';
-      eye.style.left = Math.random() * window.innerWidth + 'px';
+      const size = 20 + Math.random()*30;
+      eye.style.width = size+'px';
+      eye.style.height = 'auto';
+      eye.style.top = Math.random()*window.innerHeight+'px';
+      eye.style.left = Math.random()*window.innerWidth+'px';
       document.body.appendChild(eye);
       eyes.push(eye);
     }
@@ -131,9 +129,9 @@
     document.body.addEventListener('click', (e) => {
       const img = document.createElement('div');
       img.className = 'blood-drop';
-      img.style.backgroundImage = `url('${images[Math.floor(Math.random()*images.length)]}')`;
-      img.style.top = e.clientY - 25 + 'px';
-      img.style.left = e.clientX - 25 + 'px';
+      img.style.backgroundImage = `url('${bloodImages[Math.floor(Math.random()*bloodImages.length)]}')`;
+      img.style.top = e.clientY-25+'px';
+      img.style.left = e.clientX-25+'px';
       document.body.appendChild(img);
 
       const scream = document.getElementById('scream');
@@ -141,39 +139,30 @@
       scream.play();
 
       document.body.style.transform = `translate(${Math.random()*10-5}px, ${Math.random()*10-5}px)`;
-      setTimeout(() => { document.body.style.transform = 'translate(0,0)'; }, 100);
-      setTimeout(() => img.remove(), 3000);
+      setTimeout(()=>{document.body.style.transform='translate(0,0)';},100);
+      setTimeout(()=>img.remove(),3000);
     });
 
     const character = document.getElementById('character');
     character.addEventListener('click', () => {
       const reason = prompt('왜 여기에 접속했나요? / لماذا دخلت هنا؟ / Почему вы здесь?');
-      if(reason) {
+      if(reason){
         alert(`당신이 여기에 접속한 이유: ${reason} ...좋아요, 계속 지켜볼게. / جيد, سأراقبك. / Хорошо, я буду наблюдать.`);
-      } else {
+      }else{
         alert('답이 없군요... / لا إجابة ... / Нет ответа...');
       }
     });
 
+    // 캐릭터 마우스 따라 움직임
     document.addEventListener('mousemove', (e) => {
       const rect = character.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
+      const centerX = rect.left+rect.width/2;
+      const centerY = rect.top+rect.height/2;
 
       const maxMove = 10;
-      const deltaX = Math.max(Math.min(e.clientX - centerX, maxMove), -maxMove);
-      const deltaY = Math.max(Math.min(e.clientY - centerY, maxMove), -maxMove);
-
+      const deltaX = Math.max(Math.min(e.clientX-centerX,maxMove),-maxMove);
+      const deltaY = Math.max(Math.min(e.clientY-centerY,maxMove),-maxMove);
       character.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-
-      // 눈이 마우스를 따라보기
-      eyes.forEach(eye => {
-        const eyeRect = eye.getBoundingClientRect();
-        const eyeCenterX = eyeRect.left + eyeRect.width / 2;
-        const eyeCenterY = eyeRect.top + eyeRect.height / 2;
-        const angle = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterX);
-        eye.style.transform = `translate(-50%, -50%) rotate(${angle}rad)`;
-      });
     });
   </script>
 </body>
