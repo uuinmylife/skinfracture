@@ -3,151 +3,165 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>기괴한 스토리 홈페이지</title>
+<title>기괴한 인터랙티브 스토리</title>
 <style>
   body {
-    margin: 0;
-    background-color: #0a0a0a;
-    color: #fff;
-    font-family: 'Courier New', monospace;
-    overflow: hidden;
-    height: 100vh;
-    position: relative;
+    margin:0;
+    padding:0;
+    background:#0a0a0a;
+    color:#fff;
+    font-family:'Courier New', monospace;
+    overflow:hidden;
+    height:100vh;
+    position:relative;
   }
 
-  /* 캐릭터 스타일 */
+  /* 캐릭터 */
   .character {
-    position: absolute;
-    width: 120px;
-    height: 120px;
-    cursor: pointer;
-    border-radius: 20%;
-    background-color: #880000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    text-align: center;
-    padding: 5px;
-  }
-
-  .character:hover {
-    transform: scale(1.2);
+    position:absolute;
+    width:120px;
+    cursor:pointer;
     transition: transform 0.2s;
   }
+  .character:hover { transform: scale(1.2); }
 
   /* 대화창 */
   #dialogue {
     position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
     background: rgba(20,20,20,0.95);
-    padding: 15px 20px;
-    border-radius: 10px;
-    max-width: 400px;
-    display: none;
-    z-index: 100;
+    padding:15px 20px;
+    border-radius:10px;
+    max-width:400px;
+    display:none;
+    z-index:100;
   }
-
   .choice-btn {
-    display: block;
-    margin: 5px 0;
-    padding: 5px 10px;
-    background-color: #444;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    border-radius: 5px;
+    display:block;
+    margin:5px 0;
+    padding:5px 10px;
+    background:#444;
+    border:none;
+    color:#fff;
+    cursor:pointer;
+    border-radius:5px;
   }
+  .choice-btn:hover { background:#666; }
 
-  .choice-btn:hover {
-    background-color: #666;
+  /* 화면의 눈 */
+  .eye {
+    position:absolute;
+    width:50px;
+    height:50px;
+    pointer-events:none;
+    transition: transform 0.1s;
   }
 
   /* 마우스 따라다니는 요소 */
   #follower {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    pointer-events: none;
-    background-color: #ff00ff;
-    border-radius: 50%;
+    position:absolute;
+    width:50px;
+    height:50px;
+    pointer-events:none;
     transition: transform 0.1s;
   }
 </style>
 </head>
 <body>
 
-<!-- 캐릭터 -->
-<div id="skinfracture" class="character" style="top:100px; left:200px;">스킨프랙쳐</div>
-<div id="creature1" class="character" style="top:300px; left:600px;">괴물</div>
+<!-- 캐릭터 예시 -->
+<img src="https://i.ibb.co/0nGvV6B/skinfracture.png" class="character" id="skinfracture" style="top:100px; left:200px;" alt="스킨프랙쳐">
+<img src="https://i.ibb.co/ys9VvKx/creature.png" class="character" id="creature1" style="top:300px; left:600px;" alt="괴물">
 
 <!-- 대화창 -->
 <div id="dialogue"></div>
 
-<!-- 마우스 따라다니는 요소 -->
-<div id="follower"></div>
+<!-- 마우스 따라다니는 기괴 요소 -->
+<img id="follower" src="https://i.ibb.co/W2wYQy5/cute-creepy.png" alt="귀여운 기괴 이미지">
 
 <script>
-const dialogue = document.getElementById('dialogue');
-const follower = document.getElementById('follower');
-
-// 스토리 구조
+// --- 스토리 JSON 샘플 (실제 100개 이상으로 확장 가능) ---
 const story = {
-  skinfracture: {
-    text: "안녕, 나는 스킨프랙쳐야. 무엇을 할래?",
-    choices: [
-      { text: "친구가 되고 싶어", next: "friend" },
-      { text: "조금 무섭다", next: "scared" }
-    ]
+  "skinfracture": {
+    text:"안녕, 나는 스킨프랙쳐야. 무엇을 할래?",
+    choices:[
+      {text:"친구가 되고 싶어", next:"friend"},
+      {text:"조금 무섭다", next:"scared"}
+    ],
+    image:"https://i.ibb.co/0nGvV6B/skinfracture.png"
   },
-  friend: {
-    text: "좋아, 친구가 되자! 함께 모험을 떠날래?",
-    choices: [
-      { text: "응", next: "adventure" },
-      { text: "아니", next: "end" }
-    ]
+  "friend":{
+    text:"좋아, 친구가 되자! 함께 모험을 떠날래?",
+    choices:[
+      {text:"응", next:"adventure"},
+      {text:"아니", next:"end"}
+    ],
+    image:"https://i.ibb.co/ys9VvKx/creature.png"
   },
-  scared: {
-    text: "흥, 무서워할 줄 알았어... 나중에 다시 와.",
-    choices: [
-      { text: "다시 용기내서 대화", next: "skinfracture" }
-    ]
+  "scared":{
+    text:"흥, 무서워할 줄 알았어... 나중에 다시 와.",
+    choices:[
+      {text:"다시 용기내서 대화", next:"skinfracture"}
+    ],
+    image:"https://i.ibb.co/0nGvV6B/skinfracture.png"
   },
-  adventure: {
-    text: "모험을 시작했다! 기괴하지만 재밌는 하루가 될 거야.",
-    choices: [
-      { text: "끝", next: "end" }
-    ]
+  "adventure":{
+    text:"모험을 시작했다! 기괴하지만 재밌는 하루가 될 거야.",
+    choices:[{text:"끝", next:"end"}],
+    image:"https://i.ibb.co/ys9VvKx/creature.png"
   },
-  end: {
-    text: "스토리가 끝났어. 캐릭터를 다시 클릭해봐!",
-    choices: []
+  "end":{
+    text:"스토리가 끝났어. 캐릭터를 다시 클릭해봐!",
+    choices:[],
+    image:"https://i.ibb.co/0nGvV6B/skinfracture.png"
   }
 };
 
-// 캐릭터 클릭 이벤트
-document.getElementById('skinfracture').addEventListener('click', () => startStory('skinfracture'));
+// --- 캐릭터 클릭 이벤트 ---
+const dialogue = document.getElementById('dialogue');
 
-function startStory(nodeKey) {
-  const node = story[nodeKey];
-  dialogue.innerHTML = node.text + "<br>";
+document.getElementById('skinfracture').addEventListener('click', ()=>startStory('skinfracture'));
+document.getElementById('creature1').addEventListener('click', ()=>startStory('creature1'));
+
+function startStory(nodeKey){
+  const node = story[nodeKey] || story['skinfracture'];
+  dialogue.innerHTML = node.text+"<br>";
   dialogue.style.display = 'block';
 
-  // 선택지 버튼 추가
-  node.choices.forEach(choice => {
+  node.choices.forEach(choice=>{
     const btn = document.createElement('button');
     btn.classList.add('choice-btn');
     btn.innerText = choice.text;
-    btn.onclick = () => startStory(choice.next);
+    btn.onclick = ()=>startStory(choice.next);
     dialogue.appendChild(btn);
   });
 }
 
-// 마우스 따라다니기
-document.addEventListener('mousemove', (e) => {
-  follower.style.transform = `translate(${e.clientX - 25}px, ${e.clientY - 25}px)`;
+// --- 화면에 여러 눈 생성 ---
+const eyeCount = 20; // 원하는 눈 개수
+for(let i=0;i<eyeCount;i++){
+  const eye = document.createElement('img');
+  eye.src = "https://i.ibb.co/6N0Qw9g/eye.png"; // 다양한 인종 눈 이미지로 변경 가능
+  eye.classList.add('eye');
+  eye.style.top = Math.random()*window.innerHeight + "px";
+  eye.style.left = Math.random()*window.innerWidth + "px";
+  document.body.appendChild(eye);
+}
+
+// --- 마우스 따라다니는 눈/기괴 이미지 ---
+const follower = document.getElementById('follower');
+document.addEventListener('mousemove', (e)=>{
+  follower.style.transform = `translate(${e.clientX-25}px, ${e.clientY-25}px)`;
+
+  // 눈가 살짝 따라보기
+  document.querySelectorAll('.eye').forEach(eye=>{
+    const rect = eye.getBoundingClientRect();
+    const dx = e.clientX - (rect.left+25);
+    const dy = e.clientY - (rect.top+25);
+    eye.style.transform = `translate(${dx*0.05}px, ${dy*0.05}px)`;
+  });
 });
 </script>
 
