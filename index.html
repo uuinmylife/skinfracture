@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>???</title>
+  <title>Skin Fracture</title>
   <style>
     body {
       margin: 0;
@@ -11,9 +11,9 @@
       color: #e2e2e2;
       font-family: "Arial", sans-serif;
       overflow-x: hidden;
+      cursor: crosshair;
     }
 
-    /* 데스크탑 우선 */
     .container {
       width: 100vw;
       height: 100vh;
@@ -24,7 +24,6 @@
       position: relative;
     }
 
-    /* 고어 분위기: 글리치 + 칼자국 느낌 */
     h1 {
       font-size: 4rem;
       letter-spacing: 4px;
@@ -43,7 +42,6 @@
       100% { transform: translate(0); }
     }
 
-    /* 바닥에 피 웅덩이 느낌 */
     .blood {
       position: absolute;
       bottom: 0;
@@ -70,6 +68,15 @@
       background: url('https://www.transparenttextures.com/patterns/asfalt-light.png');
       opacity: 0.07;
     }
+
+    .blood-drop {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      pointer-events: none;
+      user-select: none;
+      background-size: cover;
+    }
   </style>
 </head>
 <body>
@@ -79,5 +86,35 @@
     <div class="blood"></div>
   </div>
   <div class="noise"></div>
+
+  <audio id="scream" src="https://freesound.org/data/previews/341/341695_5260873-lq.mp3"></audio>
+
+  <script>
+    const images = [
+      'https://i.ibb.co/0FhG8Zn/blood1.png',
+      'https://i.ibb.co/6y3H7rH/blood2.png',
+      'https://i.ibb.co/7k8YV4v/eye.png'
+    ];
+
+    document.body.addEventListener('click', (e) => {
+      const img = document.createElement('div');
+      img.className = 'blood-drop';
+      img.style.backgroundImage = `url('${images[Math.floor(Math.random()*images.length)]}')`;
+      img.style.top = e.clientY - 25 + 'px';
+      img.style.left = e.clientX - 25 + 'px';
+      document.body.appendChild(img);
+
+      const scream = document.getElementById('scream');
+      scream.currentTime = 0;
+      scream.play();
+
+      // 화면 흔들기
+      document.body.style.transform = `translate(${Math.random()*10-5}px, ${Math.random()*10-5}px)`;
+      setTimeout(() => { document.body.style.transform = 'translate(0,0)'; }, 100);
+
+      // 자동 제거
+      setTimeout(() => img.remove(), 3000);
+    });
+  </script>
 </body>
 </html>
