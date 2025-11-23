@@ -31,6 +31,7 @@
       text-shadow: 2px 2px 8px rgba(255, 0, 0, 0.6);
       position: relative;
       animation: glitch 2s infinite;
+      text-align: center;
     }
 
     @keyframes glitch {
@@ -56,6 +57,7 @@
       color: #b8b8b8;
       opacity: 0.7;
       font-size: 1.1rem;
+      text-align: center;
     }
 
     .noise {
@@ -86,26 +88,45 @@
       cursor: pointer;
       transition: transform 0.05s;
     }
+
+    /* 많은 눈 */
+    .eye {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border: 2px solid black;
+      border-radius: 50%;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>YOU SHOULDN'T BE HERE</h1>
-    <p>아무도 모르는 사이트. 아무도 설명하지 않는다.</p>
+    <h1>YOU SHOULDN'T BE HERE / لا يجب أن تكون هنا / НЕ СЛЕДУЕТ БЫТЬ ЗДЕСЬ</h1>
+    <p>아무도 모르는 사이트. 아무도 설명하지 않는다. / هذا موقع لا يعرفه أحد / Никто не объяснит, что это</p>
     <div class="blood"></div>
   </div>
   <div class="noise"></div>
 
-  <img src="https://i.ibb.co/6y3H7rH/blood2.png" class="character" id="character">
+  <img src="character.png" class="character" id="character">
 
-  <audio id="scream" src="https://freesound.org/data/previews/341/341695_5260873-lq.mp3"></audio>
+  <audio id="scream" src="scream.mp3"></audio>
 
   <script>
-    const images = [
-      'https://i.ibb.co/0FhG8Zn/blood1.png',
-      'https://i.ibb.co/6y3H7rH/blood2.png',
-      'https://i.ibb.co/7k8YV4v/eye.png'
-    ];
+    const images = ['blood1.png', 'blood2.png', 'eye.png'];
+
+    // 눈 생성
+    const eyeCount = 50;
+    const eyes = [];
+    for(let i=0; i<eyeCount; i++){
+      const eye = document.createElement('div');
+      eye.className = 'eye';
+      eye.style.top = Math.random() * window.innerHeight + 'px';
+      eye.style.left = Math.random() * window.innerWidth + 'px';
+      document.body.appendChild(eye);
+      eyes.push(eye);
+    }
 
     document.body.addEventListener('click', (e) => {
       const img = document.createElement('div');
@@ -126,15 +147,14 @@
 
     const character = document.getElementById('character');
     character.addEventListener('click', () => {
-      const reason = prompt('왜 여기에 접속했나요?');
+      const reason = prompt('왜 여기에 접속했나요? / لماذا دخلت هنا؟ / Почему вы здесь?');
       if(reason) {
-        alert(`당신이 여기에 접속한 이유: ${reason} ...좋아요, 계속 지켜볼게.`);
+        alert(`당신이 여기에 접속한 이유: ${reason} ...좋아요, 계속 지켜볼게. / جيد, سأراقبك. / Хорошо, я буду наблюдать.`);
       } else {
-        alert('답이 없군요...');
+        alert('답이 없군요... / لا إجابة ... / Нет ответа...');
       }
     });
 
-    // 마우스를 따라 캐릭터 눈 움직이기
     document.addEventListener('mousemove', (e) => {
       const rect = character.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
@@ -145,6 +165,15 @@
       const deltaY = Math.max(Math.min(e.clientY - centerY, maxMove), -maxMove);
 
       character.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+      // 눈이 마우스를 따라보기
+      eyes.forEach(eye => {
+        const eyeRect = eye.getBoundingClientRect();
+        const eyeCenterX = eyeRect.left + eyeRect.width / 2;
+        const eyeCenterY = eyeRect.top + eyeRect.height / 2;
+        const angle = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterX);
+        eye.style.transform = `translate(-50%, -50%) rotate(${angle}rad)`;
+      });
     });
   </script>
 </body>
