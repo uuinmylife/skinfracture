@@ -14,6 +14,8 @@ body {
   height:100vh;
   color:#fff;
   transition: background 0.1s;
+  cursor: none; /* 기본 커서 숨기기 */
+  touch-action: none; /* 모바일 터치 제어 */
 }
 #startScreen {
   position:absolute; top:0; left:0;
@@ -46,24 +48,78 @@ body {
 }
 .choice-btn:hover { background:#666; }
 .eye { position:absolute; width:80px; height:80px; pointer-events:none; transition: transform 0.05s linear; opacity:0.9; z-index:50;}
-#follower { position:absolute; width:80px; height:80px; pointer-events:none; transition: transform 0.05s linear; z-index:90;}
+#follower { 
+  position:absolute; 
+  width:80px; height:80px; 
+  pointer-events:none; 
+  transition: transform 0.1s ease-out; 
+  z-index:90;
+  left: 0;
+  top: 0;
+}
 #pixelCanvas { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1;}
 #endingScreen {
-  display:none; position:absolute; top:0; left:0; width:100%; height:100%;
-  background-size:cover; background-position:center; z-index:200;
-  justify-content:center; align-items:center; flex-direction:column;
-  color:#ff6666; font-size:3em; text-shadow: 2px 2px 5px #000;
+  display:none; 
+  position:absolute; 
+  top:0; left:0; 
+  width:100%; height:100%;
+  background-size:cover; 
+  background-position:center; 
+  z-index:200;
+  justify-content:center; 
+  align-items:center; 
+  flex-direction:column;
+  color:#ff6666; 
+  font-size:3em; 
+  text-shadow: 2px 2px 5px #000;
 }
 #drawCanvas {
-  display:none; position:absolute; top:0; left:0; width:100%; height:100%;
-  background:rgba(0,0,0,0.8); z-index:150; cursor:crosshair;
+  display:none; 
+  position:absolute; 
+  top:0; left:0; 
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.8); 
+  z-index:150; 
+  cursor:crosshair;
+  touch-action: none; /* 모바일 터치 제어 */
 }
-#restartBtn {
+#restartBtn, #finishDrawingBtn {
   padding:15px 30px;
   font-size:0.5em;
   margin-top:20px;
   cursor:pointer;
   background:#444; color:#fff; border:none; border-radius:10px;
+}
+#drawControls {
+  position:absolute;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:160;
+  display:none;
+  background:rgba(0,0,0,0.7);
+  padding:10px;
+  border-radius:10px;
+}
+/* 모바일 대응 */
+@media (max-width: 768px) {
+  #dialogue {
+    font-size: 0.8em;
+    max-width: 90%;
+    bottom: 10px;
+  }
+  .character {
+    width: 80px;
+  }
+  #follower, .eye {
+    width: 50px;
+    height: 50px;
+  }
+  #endingScreen {
+    font-size: 2em;
+    text-align: center;
+    padding: 20px;
+  }
 }
 </style>
 </head>
@@ -93,6 +149,11 @@ body {
 <!-- 그림판 캔버스 -->
 <canvas id="drawCanvas"></canvas>
 
+<!-- 그림판 컨트롤 -->
+<div id="drawControls">
+  <button id="finishDrawingBtn">그림 완료</button>
+</div>
+
 <!-- 엔딩 화면 -->
 <div id="endingScreen" style="background-image:url('https://i.pinimg.com/736x/48/e8/78/48e878c8235324ce7c4bbbb310253889.jpg');">
   당신의 인생은 안녕한가?
@@ -102,12 +163,14 @@ body {
 <script>
 const startBtn = document.getElementById('startBtn');
 const restartBtn = document.getElementById('restartBtn');
+const finishDrawingBtn = document.getElementById('finishDrawingBtn');
 const startScreen = document.getElementById('startScreen');
 const dialogue = document.getElementById('dialogue');
 const eyes = document.querySelectorAll('.eye');
 const follower = document.getElementById('follower');
 const endingScreen = document.getElementById('endingScreen');
 const drawCanvas = document.getElementById('drawCanvas');
+const drawControls = document.getElementById('drawControls');
 const drawCtx = drawCanvas.getContext('2d');
 drawCanvas.width = window.innerWidth; drawCanvas.height = window.innerHeight;
 const pixelCanvas = document.getElementById('pixelCanvas');
@@ -126,7 +189,7 @@ const story = {
     {text:"모험 계속", next:"deepAdventure"},
     {text:"돌아간다", next:"endStory"}
   ]},
-  drawStory:{text:"좋아! 스킨프랙쳐에게 그림을 그려줘.", choices:[
+  drawStory:{text:"좋아! 스킨프랙쳐에게 그림을 그려줘. 그림을 다 그렸으면 '그림 완료' 버튼을 눌러주세요.", choices:[
     {text:"그림 그리기 시작", next:"drawCanvasScreen"}
   ]},
   drawCanvasScreen:{text:"", choices:[]},
@@ -157,10 +220,17 @@ restartBtn.onclick = ()=>{
   resetGame();
 };
 
+finishDrawingBtn.onclick = ()=>{
+  drawCanvas.style.display="none";
+  drawControls.style.display="none";
+  startStory('endStory');
+};
+
 function resetGame() {
   dialogue.style.display="none";
   document.getElementById('skinfracture').style.display="none";
   drawCanvas.style.display="none";
+  drawControls.style.display="none";
   drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
 }
 
@@ -175,6 +245,7 @@ function startStory(key){
   if(key==="endStory"){
     dialogue.style.display="none";
     drawCanvas.style.display="none";
+    drawControls.style.display="none";
     document.getElementById('skinfracture').style.display="none";
     endingScreen.style.display="flex";
     return;
@@ -182,6 +253,7 @@ function startStory(key){
   if(key==="drawCanvasScreen"){
     dialogue.style.display="none";
     drawCanvas.style.display="block";
+    drawControls.style.display="block";
     enableDrawing();
     return;
   }
@@ -196,16 +268,38 @@ function startStory(key){
   });
 }
 
-// 🔹 마우스 따라다니는 펫 + 눈
+// 🔹 마우스 따라다니는 펫 + 눈 - 위치 오류 수정
 document.addEventListener('mousemove',(e)=>{
-  follower.style.transform = `translate(${e.clientX-40}px, ${e.clientY-40}px)`;
+  // 마우스 팔로워 위치 수정
+  follower.style.left = (e.clientX - 40) + 'px';
+  follower.style.top = (e.clientY - 40) + 'px';
+  
+  // 눈동자 움직임
   eyes.forEach(eye=>{
     const rect = eye.getBoundingClientRect();
-    const dx = e.clientX-(rect.left+rect.width/2);
-    const dy = e.clientY-(rect.top+rect.height/2);
-    eye.style.transform = `translate(${dx*0.1}px, ${dy*0.1}px)`;
+    const dx = e.clientX - (rect.left + rect.width/2);
+    const dy = e.clientY - (rect.top + rect.height/2);
+    eye.style.transform = `translate(${dx * 0.1}px, ${dy * 0.1}px)`;
   });
 });
+
+// 모바일 터치 이벤트 추가
+document.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  const touch = e.touches[0];
+  
+  // 마우스 팔로워 위치 수정 (터치)
+  follower.style.left = (touch.clientX - 40) + 'px';
+  follower.style.top = (touch.clientY - 40) + 'px';
+  
+  // 눈동자 움직임 (터치)
+  eyes.forEach(eye=>{
+    const rect = eye.getBoundingClientRect();
+    const dx = touch.clientX - (rect.left + rect.width/2);
+    const dy = touch.clientY - (rect.top + rect.height/2);
+    eye.style.transform = `translate(${dx * 0.1}px, ${dy * 0.1}px)`;
+  });
+}, { passive: false });
 
 // 🔥 불 깜빡임
 function flickerLight(){
@@ -230,44 +324,85 @@ function drawPixels(){
 }
 drawPixels();
 
-// 🎨 그림판
+// 🎨 그림판 - 모바일 터치 완전 지원
 function enableDrawing(){
-  let painting=false;
+  let painting = false;
   
-  // 그림판 이벤트 리스너 초기화
-  drawCanvas.removeEventListener('mousedown', startPainting);
-  drawCanvas.removeEventListener('mouseup', stopPainting);
-  drawCanvas.removeEventListener('mousemove', draw);
-  drawCanvas.removeEventListener('dblclick', finishDrawing);
+  // 그림판 초기화
+  drawCtx.strokeStyle = 'white';
+  drawCtx.lineWidth = 4;
+  drawCtx.lineCap = 'round';
+  drawCtx.lineJoin = 'round';
   
-  function startPainting(e){
-    painting=true;
-    drawCtx.beginPath();
-    drawCtx.moveTo(e.clientX, e.clientY);
+  function getCoordinates(e) {
+    if (e.type.includes('touch')) {
+      const touch = e.touches[0];
+      const rect = drawCanvas.getBoundingClientRect();
+      return {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top
+      };
+    } else {
+      return {
+        x: e.clientX,
+        y: e.clientY
+      };
+    }
   }
   
-  function stopPainting(){
-    painting=false;
+  function startPainting(e){
+    e.preventDefault();
+    painting = true;
+    const coords = getCoordinates(e);
+    drawCtx.beginPath();
+    drawCtx.moveTo(coords.x, coords.y);
+  }
+  
+  function stopPainting(e){
+    e.preventDefault();
+    painting = false;
+    drawCtx.beginPath();
   }
   
   function draw(e){
+    e.preventDefault();
     if(!painting) return;
-    drawCtx.strokeStyle='white';
-    drawCtx.lineWidth=4;
-    drawCtx.lineTo(e.clientX, e.clientY);
+    
+    const coords = getCoordinates(e);
+    drawCtx.lineTo(coords.x, coords.y);
     drawCtx.stroke();
   }
   
-  function finishDrawing(){
-    drawCanvas.style.display="none";
-    startStory('endStory');
-  }
+  // 모든 이벤트 리스너 제거 후 재등록
+  drawCanvas.removeEventListener('mousedown', startPainting);
+  drawCanvas.removeEventListener('mouseup', stopPainting);
+  drawCanvas.removeEventListener('mousemove', draw);
+  drawCanvas.removeEventListener('mouseout', stopPainting);
   
+  drawCanvas.removeEventListener('touchstart', startPainting);
+  drawCanvas.removeEventListener('touchend', stopPainting);
+  drawCanvas.removeEventListener('touchmove', draw);
+  drawCanvas.removeEventListener('touchcancel', stopPainting);
+  
+  // 마우스 이벤트
   drawCanvas.addEventListener('mousedown', startPainting);
   drawCanvas.addEventListener('mouseup', stopPainting);
   drawCanvas.addEventListener('mousemove', draw);
-  drawCanvas.addEventListener('dblclick', finishDrawing);
+  drawCanvas.addEventListener('mouseout', stopPainting);
+  
+  // 터치 이벤트
+  drawCanvas.addEventListener('touchstart', startPainting, { passive: false });
+  drawCanvas.addEventListener('touchend', stopPainting, { passive: false });
+  drawCanvas.addEventListener('touchmove', draw, { passive: false });
+  drawCanvas.addEventListener('touchcancel', stopPainting, { passive: false });
 }
+
+// 모바일에서도 버튼 터치 이벤트 처리
+document.querySelectorAll('button').forEach(button => {
+  button.addEventListener('touchstart', function(e) {
+    e.stopPropagation();
+  });
+});
 </script>
 </body>
 </html>
