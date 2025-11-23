@@ -7,9 +7,9 @@
 <style>
 body {
   margin: 0;
-  background: #0d0d0d;
+  background: radial-gradient(circle at center, #0a0a0a, #1a1a1a);
   font-family: Arial, sans-serif;
-  overflow-x: hidden;
+  overflow: hidden;
   cursor: crosshair;
 }
 .container {
@@ -26,7 +26,7 @@ h1 {
   font-size: 4rem;
   letter-spacing: 4px;
   color: #ff3b3b;
-  text-shadow: 2px 2px 8px rgba(255,0,0,0.6);
+  text-shadow: 0 0 5px #ff0000, 0 0 15px #ff3b3b, 0 0 30px #ff6666;
   animation: glitch 2s infinite;
   text-align: center;
 }
@@ -42,16 +42,17 @@ h1 {
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 200px;
-  background: radial-gradient(circle at 50% 0%, rgba(255,0,0,0.5), rgba(150,0,0,0.8));
-  filter: blur(20px);
+  height: 250px;
+  background: radial-gradient(circle at 50% 0%, rgba(255,0,0,0.6), rgba(120,0,0,0.9));
+  filter: blur(25px);
 }
 p {
   margin-top: 10px;
   color: #b8b8b8;
   opacity: 0.7;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   text-align: center;
+  text-shadow: 0 0 3px #ff0000;
 }
 .noise {
   position: fixed;
@@ -61,7 +62,7 @@ p {
   height: 100%;
   pointer-events: none;
   background: url('https://www.transparenttextures.com/patterns/asfalt-light.png');
-  opacity: 0.07;
+  opacity: 0.08;
 }
 .blood-drop {
   position: absolute;
@@ -71,37 +72,67 @@ p {
   user-select: none;
   background: radial-gradient(circle, red, darkred);
   border-radius: 50%;
+  filter: blur(1px);
+  mix-blend-mode: overlay;
 }
 .skinfracture {
   position: absolute;
+  bottom: 50px;
+  right: 50px;
   width: 100px;
   height: 300px;
-  top: 100px;
-  left: 50%;
-  transform: translateX(-50%);
   cursor: pointer;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+.skinfracture-body {
+  width: 60px;
+  height: 180px;
+  background: linear-gradient(to bottom, #3a0f0f, #1a0a0a);
+  border-radius: 30px;
+  position: relative;
+}
+.skinfracture-head {
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle at 40% 40%, #ffeded, #3a0f0f);
+  border-radius: 50%;
+  position: absolute;
+  top: -60px;
+  display: flex;
   flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
 }
 .eye {
-  position: relative;
-  width: 20px;
-  height: 12px;
+  width: 10px;
+  height: 6px;
   border-radius: 50% / 50%;
-  background: white;
+  background: radial-gradient(circle at 30% 30%, #fff, #ccc);
   border: 1px solid black;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 2px;
+  margin: 1px;
 }
 .pupil {
-  width: 6px;
-  height: 6px;
-  background: radial-gradient(circle at 40% 40%, black, #111);
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle at 40% 40%, #000, #111);
   border-radius: 50%;
+}
+.game-text {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  color: #ff3b3b;
+  font-family: 'Courier New', monospace;
+  font-size: 1.2rem;
+  text-shadow: 0 0 5px #ff0000;
 }
 </style>
 </head>
@@ -112,27 +143,39 @@ p {
   <div class="blood"></div>
 </div>
 <div class="noise"></div>
-<div class="skinfracture" id="skinfracture"></div>
+<audio id="bgmusic" src="scary_piano.mp3" loop autoplay></audio>
+<div class="skinfracture" id="skinfracture">
+  <div class="skinfracture-head" id="sf-head"></div>
+  <div class="skinfracture-body"></div>
+</div>
+<div class="game-text" id="game-text">스킨프랙쳐가 당신을 바라보고 있습니다...</div>
 <script>
-const eyeCount = 50;
+// 화면 눈 생성
+const eyeCount = 70;
 const eyes = [];
 for(let i=0;i<eyeCount;i++){
-  const eye = document.createElement('div');
+  const eye=document.createElement('div');
   eye.className='eye';
-  const pupil = document.createElement('div');
+  const pupil=document.createElement('div');
   pupil.className='pupil';
   eye.appendChild(pupil);
+  eye.style.top=Math.random()*window.innerHeight+'px';
+  eye.style.left=Math.random()*window.innerWidth+'px';
   document.body.appendChild(eye);
   eyes.push({eye,pupil});
 }
+
+// 클릭 피 효과
 document.body.addEventListener('click',(e)=>{
   const drop=document.createElement('div');
   drop.className='blood-drop';
   drop.style.top=e.clientY-25+'px';
   drop.style.left=e.clientX-25+'px';
   document.body.appendChild(drop);
-  setTimeout(()=>drop.remove(),4000);
+  setTimeout(()=>drop.remove(),5000);
 });
+
+// 눈 마우스 추적
 document.addEventListener('mousemove',(e)=>{
   eyes.forEach(o=>{
     const rect=o.eye.getBoundingClientRect();
@@ -141,27 +184,30 @@ document.addEventListener('mousemove',(e)=>{
     const dx=e.clientX-eyeX;
     const dy=e.clientY-eyeY;
     const angle=Math.atan2(dy,dx);
-    o.pupil.style.transform=`translate(${Math.cos(angle)*4}px,${Math.sin(angle)*4}px)`;
+    o.pupil.style.transform=`translate(${Math.cos(angle)*5}px,${Math.sin(angle)*5}px)`;
   });
 });
+
+// 스킨프랙쳐 머리에 눈 추가
+const sfHead=document.getElementById('sf-head');
+for(let i=0;i<20;i++){
+  const eye=document.createElement('div');
+  eye.className='eye';
+  const pupil=document.createElement('div');
+  pupil.className='pupil';
+  eye.appendChild(pupil);
+  sfHead.appendChild(eye);
+}
+
+// 상호작용 게임 텍스트
 const skinfracture=document.getElementById('skinfracture');
-const bodyParts = ['head','torso','leftArm','rightArm','leftLeg','rightLeg'];
-bodyParts.forEach(part=>{
-  for(let i=0;i<5;i++){
-    const eye=document.createElement('div');
-    eye.className='eye';
-    const pupil=document.createElement('div');
-    pupil.className='pupil';
-    eye.appendChild(pupil);
-    skinfracture.appendChild(eye);
-  }
-});
 skinfracture.addEventListener('click',()=>{
-  const msg=prompt('스킨프랙쳐를 클릭했습니다. 당신의 이름은? / لقد نقرت على Skin Fracture. ما اسمك؟ / Вы нажали на Skin Fracture. Как вас зовут?');
-  if(msg){
-    alert(`좋아요, ${msg}... 스킨프랙쳐가 당신을 지켜보고 있습니다.`);
+  const name=prompt('스킨프랙쳐를 클릭했습니다. 당신의 이름은?');
+  const gameText=document.getElementById('game-text');
+  if(name){
+    gameText.textContent=`좋아요, ${name}... 스킨프랙쳐가 당신을 지켜보고 있습니다.`;
   } else {
-    alert('이름이 없군요... 스킨프랙쳐가 지켜봅니다.');
+    gameText.textContent='이름이 없군요... 스킨프랙쳐가 지켜봅니다.';
   }
 });
 </script>
