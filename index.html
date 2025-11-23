@@ -1,137 +1,157 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>기괴한 선택지 스토리</title>
-<style>
-  body {
-    margin:0;
-    padding:0;
-    background:#0a0a0a;
-    color:#fff;
-    font-family:'Courier New', monospace;
-    overflow:hidden;
-    height:100vh;
-    position:relative;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>기괴한 홈페이지</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0a0a0a;
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      overflow: hidden;
+      height: 100vh;
+      position: relative;
+    }
+    .character {
+      position: absolute;
+      width: 120px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .character:hover { transform: scale(1.2); }
 
-  /* 캐릭터 */
-  .character {
-    position:absolute;
-    width:120px;
-    cursor:pointer;
-    transition: transform 0.2s;
-  }
-  .character:hover { transform: scale(1.2); }
+    #dialogue {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(20,20,20,0.95);
+      padding: 15px 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      display: none;
+      z-index: 100;
+    }
+    .choice-btn {
+      display: block;
+      margin: 5px 0;
+      padding: 5px 10px;
+      background: #444;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .choice-btn:hover { background: #666; }
 
-  /* 대화창 */
-  #dialogue {
-    position: fixed;
-    bottom:20px;
-    left:50%;
-    transform:translateX(-50%);
-    background: rgba(20,20,20,0.95);
-    padding:15px 20px;
-    border-radius:10px;
-    max-width:400px;
-    display:none;
-    z-index:100;
-  }
-  .choice-btn {
-    display:block;
-    margin:5px 0;
-    padding:5px 10px;
-    background:#444;
-    border:none;
-    color:#fff;
-    cursor:pointer;
-    border-radius:5px;
-  }
-  .choice-btn:hover { background:#666; }
+    .eye {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      pointer-events: none;
+      transition: transform 0.1s;
+      opacity: 0.8;
+    }
 
-  /* 화면 전체 이미지 */
-  #horribleScreen {
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    display:none;
-    background-size:cover;
-    background-position:center;
-    z-index:50;
-  }
-</style>
+    #follower {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      pointer-events: none;
+      transition: transform 0.1s;
+      background-color: #ff00ff;
+      border-radius: 50%;
+    }
+  </style>
 </head>
 <body>
+  <!-- 스킨프랙쳐 이미지: 네가 준 URL 사용 -->
+  <img src="https://th.bing.com/th/id/OIP.v7gDDbmx9bBH02zyTS9TkAHaNV?w=115&h=180&c=7&r=0&o=7&pid=1.7&rm=3" class="character" id="skinfracture" style="top:100px; left:200px;" alt="스킨프랙쳐">
 
-<!-- 캐릭터 -->
-<img src="https://i.ibb.co/0nGvV6B/skinfracture.png" class="character" id="skinfracture" style="top:100px; left:200px;" alt="스킨프랙쳐">
+  <div id="dialogue"></div>
 
-<!-- 대화창 -->
-<div id="dialogue"></div>
+  <div id="follower"></div>
 
-<!-- 화면 바뀔 기괴 이미지 -->
-<div id="horribleScreen"></div>
+  <script>
+    const dialogue = document.getElementById('dialogue');
 
-<script>
-// 스토리 예제
-const story = {
-  skinfracture: {
-    text:"안녕, 나는 스킨프랙쳐야. 무엇을 할래?",
-    choices:[
-      {text:"친구가 되고 싶어", next:"friend"},
-      {text:"조금 무섭다", next:"scared"}
-    ]
-  },
-  friend:{
-    text:"좋아, 친구가 되자! 함께 모험을 떠날래?",
-    choices:[
-      {text:"응", next:"horribleImage"},
-      {text:"아니", next:"end"}
-    ]
-  },
-  scared:{text:"흥, 무서워할 줄 알았어...", choices:[{text:"다시", next:"skinfracture"}]},
-  horribleImage:{
-    text:"", choices:[],
-    image:"https://i.ibb.co/3d7s1D7/horrible.jpg" // 여기에 기괴한 이미지 URL
-  },
-  end:{text:"스토리가 끝났어. 캐릭터를 다시 클릭해봐!", choices:[]}
-};
+    // 단순 스토리 예시
+    const story = {
+      skinfracture: {
+        text: "안녕, 나는 스킨프랙쳐야. 무엇을 할래?",
+        choices: [
+          { text: "모험하러 가자", next: "adventure" },
+          { text: "여기서 멈출래", next: "end" }
+        ]
+      },
+      adventure: {
+        text: "모험을 시작했어. 기묘한 눈들이 너를 지켜보고 있어...",
+        choices: [
+          { text: "계속 보기", next: "eyes" },
+          { text: "무서워서 돌아가", next: "end" }
+        ]
+      },
+      eyes: {
+        text: "눈들이 네 움직임을 따라 움직여!",
+        choices: [
+          { text: "끝", next: "end" }
+        ]
+      },
+      end: {
+        text: "끝이야. 다시 캐릭터를 눌러봐.",
+        choices: []
+      }
+    };
 
-const dialogue = document.getElementById('dialogue');
-const horribleScreen = document.getElementById('horribleScreen');
+    document.getElementById('skinfracture').addEventListener('click', () => startStory('skinfracture'));
 
-// 캐릭터 클릭
-document.getElementById('skinfracture').addEventListener('click', ()=>startStory('skinfracture'));
+    function startStory(key) {
+      const node = story[key];
+      dialogue.innerHTML = node.text + "<br>";
+      dialogue.style.display = 'block';
+      node.choices.forEach(c => {
+        const btn = document.createElement('button');
+        btn.classList.add('choice-btn');
+        btn.textContent = c.text;
+        btn.onclick = () => {
+          dialogue.innerHTML = "";
+          startStory(c.next);
+        };
+        dialogue.appendChild(btn);
+      });
+    }
 
-function startStory(nodeKey){
-  const node = story[nodeKey];
+    // 눈 이미지 배치 (다양한 인종 느낌의 눈 URL 사용)
+    const eyeUrls = [
+      "https://cdn.pixabay.com/photo/2016/11/29/06/16/eyes-1866414_1280.jpg",  // 예시 URL (픽사베이)
+      "https://cdn.pixabay.com/photo/2015/06/24/15/45/eye-820274_1280.jpg",
+      "https://cdn.pixabay.com/photo/2017/08/06/08/58/eye-2592661_1280.jpg",
+      "https://cdn.pixabay.com/photo/2014/04/02/11/53/eye-303932_1280.jpg"
+    ];
 
-  // 만약 기괴 이미지 노드라면 전체 화면 전환
-  if(nodeKey==="horribleImage"){
-    horribleScreen.style.backgroundImage = `url(${node.image})`;
-    horribleScreen.style.display="block";
-    dialogue.style.display="none";
-    return;
-  } else {
-    horribleScreen.style.display="none";
-  }
+    for (let i = 0; i < eyeUrls.length; i++) {
+      const eye = document.createElement('img');
+      eye.src = eyeUrls[i];
+      eye.classList.add('eye');
+      eye.style.top = Math.random() * window.innerHeight + "px";
+      eye.style.left = Math.random() * window.innerWidth + "px";
+      document.body.appendChild(eye);
+    }
 
-  dialogue.innerHTML = node.text+"<br>";
-  dialogue.style.display="block";
-
-  // 선택지 버튼
-  node.choices.forEach(choice=>{
-    const btn = document.createElement('button');
-    btn.classList.add('choice-btn');
-    btn.innerText = choice.text;
-    btn.onclick = ()=>startStory(choice.next);
-    dialogue.appendChild(btn);
-  });
-}
-</script>
-
+    // 마우스 따라다니는 요소
+    const follower = document.getElementById('follower');
+    document.addEventListener('mousemove', (e) => {
+      follower.style.transform = `translate(${e.clientX - 25}px, ${e.clientY - 25}px)`;
+      document.querySelectorAll('.eye').forEach(eye => {
+        const rect = eye.getBoundingClientRect();
+        const dx = e.clientX - (rect.left + rect.width / 2);
+        const dy = e.clientY - (rect.top + rect.height / 2);
+        eye.style.transform = `translate(${dx * 0.05}px, ${dy * 0.05}px)`;
+      });
+    });
+  </script>
 </body>
 </html>
