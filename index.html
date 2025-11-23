@@ -115,9 +115,9 @@
     const eyes = [];
     for(let i=0; i<eyeCount; i++){
       const eye = document.createElement('img');
-      eye.src = eyeImages[Math.floor(Math.random()*eyeImages.length)];
+      eye.src = eyeImages[i % eyeImages.length]; // 이미지 순서 반복
       eye.className = 'eye';
-      const size = 20 + Math.random()*30;
+      const size = 30 + Math.random()*20;
       eye.style.width = size+'px';
       eye.style.height = 'auto';
       eye.style.top = Math.random()*window.innerHeight+'px';
@@ -148,7 +148,7 @@
       const reason = prompt('왜 여기에 접속했나요? / لماذا دخلت هنا؟ / Почему вы здесь?');
       if(reason){
         alert(`당신이 여기에 접속한 이유: ${reason} ...좋아요, 계속 지켜볼게. / جيد, سأراقبك. / Хорошо, я буду наблюдать.`);
-      }else{
+      } else {
         alert('답이 없군요... / لا إجابة ... / Нет ответа...');
       }
     });
