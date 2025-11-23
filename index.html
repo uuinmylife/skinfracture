@@ -76,7 +76,8 @@
       height: 50px;
       pointer-events: none;
       user-select: none;
-      background-size: cover;
+      background: radial-gradient(circle, red, darkred);
+      border-radius: 50%;
     }
 
     .character {
@@ -84,28 +85,49 @@
       bottom: 50px;
       right: 50px;
       width: 150px;
+      height: 150px;
       cursor: pointer;
       transition: transform 0.05s;
+      background: darkred;
+      border: 2px solid black;
+      border-radius: 10%;
     }
 
     .eye {
       position: absolute;
-      width: 20px;
-      height: 20px;
+      width: 25px;
+      height: 25px;
       border-radius: 50%;
-      background: white;
-      border: 2px solid black;
+      background: radial-gradient(circle at 30% 30%, #fff, #ccc);
+      border: 2px solid #000;
       display: flex;
       justify-content: center;
       align-items: center;
       pointer-events: none;
+      box-shadow: 0 0 5px rgba(255,255,255,0.6);
     }
 
     .pupil {
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       background: black;
       border-radius: 50%;
+    }
+
+    .skinfracture {
+      position: absolute;
+      width: 120px;
+      height: 220px;
+      background: #3a0f0f;
+      border-radius: 20px;
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
     }
   </style>
 </head>
@@ -115,52 +137,40 @@
     <p>아무도 모르는 사이트. 아무도 설명하지 않는다. / هذا موقع لا يعرفه أحد / Никто не объяснит, что это</p>
     <div class="blood"></div>
   </div>
+
   <div class="noise"></div>
 
-  <div class="character" id="character"></div>
+  <div class="skinfracture" id="skinfracture"></div>
 
   <script>
+    // 화면에 픽셀 눈 생성
     const eyeCount = 50;
     const eyes = [];
-
-    for(let i=0; i<eyeCount; i++){
+    for(let i=0;i<eyeCount;i++){
       const eye = document.createElement('div');
-      eye.className = 'eye';
-      eye.style.top = Math.random()*window.innerHeight+'px';
-      eye.style.left = Math.random()*window.innerWidth+'px';
+      eye.className='eye';
+      eye.style.top=Math.random()*window.innerHeight+'px';
+      eye.style.left=Math.random()*window.innerWidth+'px';
 
       const pupil = document.createElement('div');
-      pupil.className = 'pupil';
+      pupil.className='pupil';
       eye.appendChild(pupil);
 
       document.body.appendChild(eye);
       eyes.push({eye,pupil});
     }
 
+    // 클릭 시 피 자국 추가
     document.body.addEventListener('click',(e)=>{
-      const drop = document.createElement('div');
+      const drop=document.createElement('div');
       drop.className='blood-drop';
       drop.style.top=e.clientY-25+'px';
       drop.style.left=e.clientX-25+'px';
-      drop.style.background='radial-gradient(circle, red, darkred)';
       document.body.appendChild(drop);
-      setTimeout(()=>drop.remove(),3000);
+      setTimeout(()=>drop.remove(),4000);
     });
 
-    const character = document.getElementById('character');
-    character.style.width='150px';
-    character.style.height='150px';
-    character.style.background='red';
-
-    character.addEventListener('click',()=>{
-      const reason = prompt('왜 여기에 접속했나요? / لماذا دخلت هنا؟ / Почему вы здесь?');
-      if(reason){
-        alert(`...좋아요, 계속 지켜볼게. / جيد, سأراقبك. / Хорошо, я буду наблюдать.`);
-      }else{
-        alert('답이 없군요... / لا إجابة ... / Нет ответа...');
-      }
-    });
-
+    // 눈 움직임
     document.addEventListener('mousemove',(e)=>{
       eyes.forEach(o=>{
         const rect=o.eye.getBoundingClientRect();
@@ -169,16 +179,33 @@
         const dx=e.clientX-eyeX;
         const dy=e.clientY-eyeY;
         const angle=Math.atan2(dy,dx);
-        o.pupil.style.transform=`translate(${Math.cos(angle)*5}px, ${Math.sin(angle)*5}px)`;
+        o.pupil.style.transform=`translate(${Math.cos(angle)*5}px,${Math.sin(angle)*5}px)`;
       });
+    });
 
-      const rectC=character.getBoundingClientRect();
-      const centerX=rectC.left+rectC.width/2;
-      const centerY=rectC.top+rectC.height/2;
-      const maxMove=10;
-      const deltaX=Math.max(Math.min(e.clientX-centerX,maxMove),-maxMove);
-      const deltaY=Math.max(Math.min(e.clientY-centerY,maxMove),-maxMove);
-      character.style.transform=`translate(${deltaX}px, ${deltaY}px)`;
+    // 스킨프랙쳐 클릭 상호작용
+    const skinfracture=document.getElementById('skinfracture');
+    for(let i=0;i<20;i++){
+      const eye=document.createElement('div');
+      eye.className='eye';
+      eye.style.width='15px';
+      eye.style.height='15px';
+      const pupil=document.createElement('div');
+      pupil.className='pupil';
+      pupil.style.width='6px';
+      pupil.style.height='6px';
+      eye.appendChild(pupil);
+      eye.style.margin='2px';
+      skinfracture.appendChild(eye);
+    }
+
+    skinfracture.addEventListener('click',()=>{
+      const msg=prompt('스킨프랙쳐를 클릭했습니다. 당신의 이름은? / لقد نقرت على Skin Fracture. ما اسمك؟ / Вы нажали на Skin Fracture. Как вас зовут?');
+      if(msg){
+        alert(`좋아요, ${msg}... 스킨프랙쳐가 당신을 지켜보고 있습니다.`);
+      } else {
+        alert('이름이 없군요... 스킨프랙쳐가 지켜봅니다.');
+      }
     });
   </script>
 </body>
