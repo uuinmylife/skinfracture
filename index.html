@@ -77,6 +77,15 @@
       user-select: none;
       background-size: cover;
     }
+
+    .character {
+      position: absolute;
+      bottom: 50px;
+      right: 50px;
+      width: 150px;
+      cursor: pointer;
+      transition: transform 0.05s;
+    }
   </style>
 </head>
 <body>
@@ -86,6 +95,8 @@
     <div class="blood"></div>
   </div>
   <div class="noise"></div>
+
+  <img src="https://i.ibb.co/6y3H7rH/blood2.png" class="character" id="character">
 
   <audio id="scream" src="https://freesound.org/data/previews/341/341695_5260873-lq.mp3"></audio>
 
@@ -108,12 +119,32 @@
       scream.currentTime = 0;
       scream.play();
 
-      // 화면 흔들기
       document.body.style.transform = `translate(${Math.random()*10-5}px, ${Math.random()*10-5}px)`;
       setTimeout(() => { document.body.style.transform = 'translate(0,0)'; }, 100);
-
-      // 자동 제거
       setTimeout(() => img.remove(), 3000);
+    });
+
+    const character = document.getElementById('character');
+    character.addEventListener('click', () => {
+      const reason = prompt('왜 여기에 접속했나요?');
+      if(reason) {
+        alert(`당신이 여기에 접속한 이유: ${reason} ...좋아요, 계속 지켜볼게.`);
+      } else {
+        alert('답이 없군요...');
+      }
+    });
+
+    // 마우스를 따라 캐릭터 눈 움직이기
+    document.addEventListener('mousemove', (e) => {
+      const rect = character.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      const maxMove = 10;
+      const deltaX = Math.max(Math.min(e.clientX - centerX, maxMove), -maxMove);
+      const deltaY = Math.max(Math.min(e.clientY - centerY, maxMove), -maxMove);
+
+      character.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
     });
   </script>
 </body>
