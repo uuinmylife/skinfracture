@@ -28,6 +28,18 @@ body {
     pointer-events: none;
 }
 
+.eye {
+  width: 10px;
+  height: 6px;
+  border-radius: 50% / 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, #ccc);
+  border: 1px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1px;
+}
+
 .blood {
     position: absolute;
     width: 5px;
@@ -102,6 +114,21 @@ document.addEventListener('mousemove', (e) => {
         setTimeout(() => blood.remove(), 1000);
     }
 });
+
+// 화면 눈 생성
+const eyeCount = 70;
+const eyes = [];
+for(let i=0;i<eyeCount;i++){
+  const eye=document.createElement('div');
+  eye.className='eye';
+  const pupil=document.createElement('div');
+  pupil.className='pupil';
+  eye.appendChild(pupil);
+  eye.style.top=Math.random()*window.innerHeight+'px';
+  eye.style.left=Math.random()*window.innerWidth+'px';
+  document.body.appendChild(eye);
+  eyes.push({eye,pupil});
+}
 
 // 장난감 픽셀 생성
 function spawnToy() {
