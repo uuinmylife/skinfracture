@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Skin Fracture - High Gore</title>
+<title>Skin Fracture - Ultimate Gore</title>
 <style>
 body {
   margin: 0;
@@ -64,15 +64,14 @@ p { margin-top:10px; color:#b8b8b8; opacity:0.7; font-size:1.2rem; text-align:ce
   <div class="skinfracture-body"></div>
 </div>
 
-<!-- 장난감 추가 -->
 <div class="toy" id="toy1" style="top:200px; left:300px; background-image:url('toy1.png');"></div>
 <div class="toy" id="toy2" style="top:400px; left:600px; background-image:url('toy2.png');"></div>
 
 <div class="game-text" id="game-text">스킨프랙쳐가 당신을 바라보고 있습니다...</div>
 
 <script>
-// 화면 눈 생성
-const eyeCount = 70;
+// 눈 생성 및 마우스 추적
+const eyeCount = 100;
 const eyes = [];
 for(let i=0;i<eyeCount;i++){
   const eye=document.createElement('div'); eye.className='eye';
@@ -84,16 +83,6 @@ for(let i=0;i<eyeCount;i++){
   eyes.push({eye,pupil});
 }
 
-// 클릭 피 효과
-document.body.addEventListener('click',(e)=>{
-  const drop=document.createElement('div'); drop.className='blood-drop';
-  drop.style.top=e.clientY-25+'px';
-  drop.style.left=e.clientX-25+'px';
-  document.body.appendChild(drop);
-  setTimeout(()=>drop.remove(),5000);
-});
-
-// 눈 마우스 추적
 document.addEventListener('mousemove',(e)=>{
   eyes.forEach(o=>{
     const rect=o.eye.getBoundingClientRect();
@@ -106,21 +95,30 @@ document.addEventListener('mousemove',(e)=>{
   });
 });
 
-// 스킨프랙쳐 머리에 눈 추가
+// 클릭 피 효과
+document.body.addEventListener('click',(e)=>{
+  const drop=document.createElement('div'); drop.className='blood-drop';
+  drop.style.top=e.clientY-25+'px';
+  drop.style.left=e.clientX-25+'px';
+  document.body.appendChild(drop);
+  setTimeout(()=>drop.remove(),5000);
+});
+
+// 스킨프랙쳐 눈 추가
 const sfHead=document.getElementById('sf-head');
-for(let i=0;i<25;i++){
+for(let i=0;i<30;i++){
   const eye=document.createElement('div'); eye.className='eye';
   const pupil=document.createElement('div'); pupil.className='pupil';
   eye.appendChild(pupil); sfHead.appendChild(eye);
 }
 
-// 스킨프랙쳐 클릭 상호작용
+// 스킨프랙쳐 상호작용
 const skinfracture=document.getElementById('skinfracture');
 skinfracture.addEventListener('click',()=>{
   const name=prompt('스킨프랙쳐를 클릭했습니다. 당신의 이름은?');
   const gameText=document.getElementById('game-text');
   if(name){
-    gameText.textContent=`[스킨프랙쳐] ${name}... 내가 너를 지켜보고 있다...`;
+    gameText.textContent=`[스킨프랙쳐] ${name}... 내가 너를 지켜보고 있다...`; 
   } else {
     gameText.textContent='[스킨프랙쳐] 이름이 없군... 너를 주시하고 있다...';
   }
