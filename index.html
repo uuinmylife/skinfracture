@@ -3,103 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>기괴한 스토리 + 그림판</title>
+<title>skinfracture</title>
 <style>
 body {
-  margin:0;
-  padding:0;
+  margin:0; padding:0;
   background:#0a0a0a;
   font-family:'Courier New', monospace;
   overflow:hidden;
   height:100vh;
-  position:relative;
   color:#fff;
   transition: background 0.1s;
 }
-.character {
-  position:absolute;
-  width:120px;
-  cursor:pointer;
-  transition: transform 0.2s;
-}
-.character:hover { transform: scale(1.2); }
-#dialogue {
-  position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:rgba(20,20,20,0.95);
-  padding:15px 20px;
-  border-radius:10px;
-  max-width:500px;
-  display:none;
-  z-index:100;
-}
-.choice-btn {
-  display:block;
-  margin:5px 0;
-  padding:5px 10px;
-  background:#444;
-  border:none;
-  color:#fff;
-  cursor:pointer;
-  border-radius:5px;
-}
-.choice-btn:hover { background:#666; }
-.eye {
-  position:absolute;
-  width:80px;
-  height:80px;
-  pointer-events:none;
-  transition: transform 0.05s linear;
-  opacity:0.9;
-}
-#follower {
-  position:absolute;
-  width:80px;
-  height:80px;
-  pointer-events:none;
-  transition: transform 0.05s linear;
-}
-#pixelCanvas {
-  position:absolute;
-  top:0; left:0;
+#startScreen {
+  position:absolute; top:0; left:0;
   width:100%; height:100%;
-  pointer-events:none;
-  z-index:1;
-}
-#endingScreen {
-  display:none;
-  position:absolute;
-  top:0; left:0;
-  width:100%; height:100%;
-  background-size:cover;
-  background-position:center;
-  z-index:200;
+  background:#111;
   display:flex;
   justify-content:center;
   align-items:center;
   flex-direction:column;
-  color:#ff6666;
-  font-size:3em;
-  text-shadow: 2px 2px 5px #000;
+  font-size:2em;
+  z-index:300;
+}
+#startScreen button {
+  padding:15px 30px;
+  font-size:1em;
+  margin-top:20px;
+  cursor:pointer;
+  background:#444; color:#fff; border:none; border-radius:10px;
+}
+.character { position:absolute; width:120px; cursor:pointer; transition: transform 0.2s; z-index:100;}
+.character:hover { transform: scale(1.2); }
+#dialogue {
+  position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+  background:rgba(20,20,20,0.95); padding:15px 20px;
+  border-radius:10px; max-width:500px; display:none; z-index:100;
+}
+.choice-btn {
+  display:block; margin:5px 0; padding:5px 10px;
+  background:#444; border:none; color:#fff; cursor:pointer; border-radius:5px;
+}
+.choice-btn:hover { background:#666; }
+.eye { position:absolute; width:80px; height:80px; pointer-events:none; transition: transform 0.05s linear; opacity:0.9; z-index:50;}
+#follower { position:absolute; width:80px; height:80px; pointer-events:none; transition: transform 0.05s linear; z-index:90;}
+#pixelCanvas { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1;}
+#endingScreen {
+  display:none; position:absolute; top:0; left:0; width:100%; height:100%;
+  background-size:cover; background-position:center; z-index:200;
+  display:flex; justify-content:center; align-items:center; flex-direction:column;
+  color:#ff6666; font-size:3em; text-shadow: 2px 2px 5px #000;
 }
 #drawCanvas {
-  display:none;
-  position:absolute;
-  top:0; left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.8);
-  z-index:150;
-  cursor:crosshair;
+  display:none; position:absolute; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.8); z-index:150; cursor:crosshair;
 }
 </style>
 </head>
 <body>
 
+<!-- 시작 화면 -->
+<div id="startScreen">
+  기괴한 세계에 오신 것을 환영합니다. 시작하시겠습니까?
+  <button id="startBtn">예</button>
+</div>
+
 <!-- 캐릭터 -->
-<img src="https://www.bing.com/images/search?view=detailV2&ccid=v7gDDbmx&id=65919FA06BAC574790A28E56A9A66E66AA76DF52&thid=OIP.v7gDDbmx9bBH02zyTS9TkAHaNV&mediaurl=https%3a%2f%2fi.pinimg.com%2foriginals%2fbe%2fb5%2fea%2fbeb5ea94a69fe47b9c11e8be471fa358.jpg&exph=1650&expw=916&q=gore+dool&FORM=IRPRST&ck=A666415AEC828F72CE595230F263680F&selectedIndex=6&itb=0" class="character" id="skinfracture" style="top:100px; left:200px;" alt="스킨프랙쳐">
+<img src="https://i.pinimg.com/originals/be/b5/ea/beb5ea94a69fe47b9c11e8be471fa358.jpg" class="character" id="skinfracture" style="top:100px; left:200px;" alt="스킨프랙쳐">
 
 <div id="dialogue"></div>
 
@@ -122,22 +91,20 @@ body {
 </div>
 
 <script>
+const startBtn = document.getElementById('startBtn');
+const startScreen = document.getElementById('startScreen');
 const dialogue = document.getElementById('dialogue');
 const eyes = document.querySelectorAll('.eye');
 const follower = document.getElementById('follower');
 const endingScreen = document.getElementById('endingScreen');
 const drawCanvas = document.getElementById('drawCanvas');
 const drawCtx = drawCanvas.getContext('2d');
-
-// 캔버스 크기 맞춤
-drawCanvas.width = window.innerWidth;
-drawCanvas.height = window.innerHeight;
+drawCanvas.width = window.innerWidth; drawCanvas.height = window.innerHeight;
 const pixelCanvas = document.getElementById('pixelCanvas');
 const pixelCtx = pixelCanvas.getContext('2d');
-pixelCanvas.width = window.innerWidth;
-pixelCanvas.height = window.innerHeight;
+pixelCanvas.width = window.innerWidth; pixelCanvas.height = window.innerHeight;
 
-// 스토리 JSON + 그림 그리기 선택지
+// 🔹 스토리 JSON
 const story = {
   skinfracture:{text:"나는 스킨프랙쳐야. 오늘 기괴한 모험을 할래?", choices:[
     {text:"응, 시작하자", next:"adventure1"},
@@ -152,7 +119,7 @@ const story = {
   drawStory:{text:"좋아! 스킨프랙쳐에게 그림을 그려줘.", choices:[
     {text:"그림 그리기 시작", next:"drawCanvasScreen"}
   ]},
-  drawCanvasScreen:{text:"", choices:[]}, // 실제 그림판 실행
+  drawCanvasScreen:{text:"", choices:[]},
   scared1:{text:"흥, 무서워할 줄 알았어.", choices:[
     {text:"다시 용기내기", next:"adventure1"},
     {text:"도망가기", next:"endStory"}
@@ -168,8 +135,19 @@ const story = {
   endStory:{text:"", choices:[]}
 };
 
-document.getElementById('skinfracture').addEventListener('click',()=>startStory('skinfracture'));
+// 🔹 이벤트
+startBtn.onclick = ()=>{
+  startScreen.style.display="none";
+  startGame();
+};
 
+function startGame(){
+  document.getElementById('skinfracture').style.display="block";
+  dialogue.style.display="block";
+  startStory('skinfracture');
+}
+
+// 🔹 스토리 진행
 function startStory(key){
   if(key==="endStory"){
     dialogue.style.display="none";
@@ -183,23 +161,18 @@ function startStory(key){
     enableDrawing();
     return;
   }
-
   const node = story[key];
   dialogue.innerHTML = node.text+"<br>";
-  dialogue.style.display='block';
   node.choices.forEach(c=>{
     const btn = document.createElement('button');
     btn.classList.add('choice-btn');
     btn.innerText = c.text;
-    btn.onclick = ()=>{
-      dialogue.innerHTML="";
-      startStory(c.next);
-    }
+    btn.onclick = ()=>{ dialogue.innerHTML=""; startStory(c.next);}
     dialogue.appendChild(btn);
   });
 }
 
-// 마우스 움직임
+// 🔹 마우스 따라다니는 펫 + 눈
 document.addEventListener('mousemove',(e)=>{
   follower.style.transform = `translate(${e.clientX-40}px, ${e.clientY-40}px)`;
   eyes.forEach(eye=>{
@@ -222,10 +195,10 @@ flickerLight();
 function drawPixels(){
   pixelCtx.clearRect(0,0,pixelCanvas.width,pixelCanvas.height);
   for(let i=0;i<500;i++){
-    const x = Math.random()*pixelCanvas.width;
-    const y = Math.random()*pixelCanvas.height;
-    const size = Math.random()*2+1;
-    const color = `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},0.5)`;
+    const x=Math.random()*pixelCanvas.width;
+    const y=Math.random()*pixelCanvas.height;
+    const size=Math.random()*2+1;
+    const color=`rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},0.5)`;
     pixelCtx.fillStyle=color;
     pixelCtx.fillRect(x,y,size,size);
   }
@@ -233,23 +206,13 @@ function drawPixels(){
 }
 drawPixels();
 
-// 🎨 그림 그리기 기능
+// 🎨 그림판
 function enableDrawing(){
   let painting=false;
-  drawCanvas.addEventListener('mousedown',(e)=>{painting=true; drawCtx.beginPath(); drawCtx.moveTo(e.clientX,e.clientY);});
-  drawCanvas.addEventListener('mouseup',(e)=>{painting=false;});
-  drawCanvas.addEventListener('mousemove',(e)=>{
-    if(!painting) return;
-    drawCtx.strokeStyle='white';
-    drawCtx.lineWidth=4;
-    drawCtx.lineTo(e.clientX,e.clientY);
-    drawCtx.stroke();
-  });
-  // 종료 클릭 시 엔딩
-  drawCanvas.addEventListener('dblclick',()=>{
-    drawCanvas.style.display="none";
-    startStory('endStory');
-  });
+  drawCanvas.addEventListener('mousedown',e=>{painting=true; drawCtx.beginPath(); drawCtx.moveTo(e.clientX,e.clientY);});
+  drawCanvas.addEventListener('mouseup',e=>{painting=false;});
+  drawCanvas.addEventListener('mousemove',e=>{if(!painting) return; drawCtx.strokeStyle='white'; drawCtx.lineWidth=4; drawCtx.lineTo(e.clientX,e.clientY); drawCtx.stroke();});
+  drawCanvas.addEventListener('dblclick',()=>{ drawCanvas.style.display="none"; startStory('endStory'); });
 }
 </script>
 </body>
