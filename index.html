@@ -5,111 +5,201 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Skin Fracture - Pixel Gore Ultimate</title>
 <style>
-body { margin:0; background:#0a0a0a; font-family:'Courier New', monospace; overflow:hidden; cursor:crosshair; }
-h1 { font-size:4rem; color:#ff3b3b; text-shadow:0 0 5px #ff0000,0 0 15px #ff3b3b,0 0 30px #ff6666; animation:glitch 2s infinite; text-align:center; }
-@keyframes glitch {0%{transform:translate(0);}20%{transform:translate(-2px,2px);}40%{transform:translate(2px,-2px);}60%{transform:translate(-2px,-1px);}80%{transform:translate(1px,1px);}100%{transform:translate(0);}}
-.container { width:100vw; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#e2e2e2; }
-p { margin-top:10px; color:#b8b8b8; opacity:0.7; font-size:1.2rem; text-align:center; text-shadow:0 0 3px #ff0000; }
-.noise { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; background:url('https://www.transparenttextures.com/patterns/asfalt-light.png'); opacity:0.08;}
-.blood-drop { position:absolute; width:4px; height:4px; pointer-events:none; background:red; image-rendering:pixelated; }
-.eye { width:8px; height:8px; background:#fff; border:1px solid black; display:flex; justify-content:center; align-items:center; image-rendering:pixelated; }
-.pupil { width:3px; height:3px; background:#000; image-rendering:pixelated; }
-.skinfracture { position:absolute; bottom:50px; right:50px; width:120px; height:300px; cursor:pointer; display:flex; flex-direction:column; align-items:center; image-rendering:pixelated; }
-.skinfracture-body { width:60px; height:180px; background:#3a0f0f; border-radius:0; position:relative; image-rendering:pixelated; }
-.skinfracture-head { width:60px; height:60px; background:#ffeded; border-radius:0; position:absolute; top:-60px; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; image-rendering:pixelated; }
-.toy { position:absolute; width:60px; height:60px; background:#880000; cursor:pointer; image-rendering:pixelated; display:flex; justify-content:center; align-items:center; font-size:14px; color:#fff; font-weight:bold; text-align:center; border:1px solid #ff0000; }
-.game-text { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); width:80%; color:#ff3b3b; font-family:'Courier New', monospace; font-size:1.2rem; text-shadow:0 0 5px #ff0000; }
+body {
+    margin: 0;
+    background: #0a0a0a;
+    font-family: 'Courier New', monospace;
+    overflow: hidden;
+    cursor: crosshair;
+}
+h1 {
+    font-size: 4rem;
+    color: #ff3b3b;
+    text-shadow: 0 0 5px #ff0000, 0 0 15px #ff3b3b, 0 0 30px #ff6666;
+    animation: glitch 2s infinite;
+    text-align: center;
+}
+@keyframes glitch {
+    0% {transform: translate(0);}
+    20% {transform: translate(-2px,2px);}
+    40% {transform: translate(2px,-2px);}
+    60% {transform: translate(-2px,-1px);}
+    80% {transform: translate(1px,1px);}
+    100% {transform: translate(0);}
+}
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #e2e2e2;
+}
+p {
+    margin-top: 10px;
+    color: #b8b8b8;
+    opacity: 0.7;
+    font-size: 1.2rem;
+    text-align: center;
+    text-shadow: 0 0 3px #ff0000;
+}
+.noise {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: url('https://www.transparenttextures.com/patterns/asfalt-light.png');
+    opacity: 0.08;
+}
+.blood-drop {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    pointer-events: none;
+    background: red;
+    image-rendering: pixelated;
+}
+.eye {
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    image-rendering: pixelated;
+}
+.pupil {
+    width: 3px;
+    height: 3px;
+    background: #000;
+    image-rendering: pixelated;
+}
+.skinfracture {
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+    width: 120px;
+    cursor: pointer;
+}
+.skinfracture img {
+    width: 120px;
+    height: auto;
+    image-rendering: pixelated;
+}
+.toy {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    color: #fff;
+    font-weight: bold;
+    text-align: center;
+    border: 1px solid #ff0000;
+    image-rendering: pixelated;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.game-text {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    color: #ff3b3b;
+    font-family: 'Courier New', monospace;
+    font-size: 1.2rem;
+    text-shadow: 0 0 5px #ff0000;
+}
 </style>
 </head>
 <body>
 <div class="container">
-<h1>YOU SHOULDN'T BE HERE</h1>
-<p>아무도 모르는 사이트. 아무도 설명하지 않는다.</p>
+    <h1>YOU SHOULDN'T BE HERE</h1>
+    <p>아무도 모르는 사이트. 아무도 설명하지 않는다.</p>
 </div>
+
 <div class="noise"></div>
 <audio id="bgmusic" src="scary_piano.mp3" loop autoplay></audio>
 
+<!-- 스킨프랙쳐 이미지 -->
 <div class="skinfracture" id="skinfracture">
-  <div class="skinfracture-head" id="sf-head"></div>
-  <div class="skinfracture-body"></div>
+    <img src="31201fee-831c-4906-a2cb-da1767db168f8.png" alt="Skin Fracture"/>
 </div>
 
-<div class="toy" id="toy1" style="top:200px; left:300px;">TOY 1</div>
-<div class="toy" id="toy2" style="top:400px; left:600px;">TOY 2</div>
+<!-- 장난감 이미지 -->
+<div class="toy" id="toy1" style="top:200px; left:300px; background-image:url('teddy_pixel.png');">TOY 1</div>
+<div class="toy" id="toy2" style="top:400px; left:600px; background-image:url('teddy_pixel2.png');">TOY 2</div>
 
 <div class="game-text" id="game-text">스킨프랙쳐가 당신을 바라보고 있습니다...</div>
 
 <script>
 // 픽셀 눈 생성 및 마우스 추적
-const eyeCount=150;
-const eyes=[];
+const eyeCount = 150;
+const eyes = [];
 for(let i=0;i<eyeCount;i++){
-  const eye=document.createElement('div'); eye.className='eye';
-  const pupil=document.createElement('div'); pupil.className='pupil';
-  eye.appendChild(pupil);
-  eye.style.top=Math.random()*window.innerHeight+'px';
-  eye.style.left=Math.random()*window.innerWidth+'px';
-  document.body.appendChild(eye);
-  eyes.push({eye,pupil});
+    const eye = document.createElement('div'); 
+    eye.className = 'eye';
+    const pupil = document.createElement('div'); 
+    pupil.className = 'pupil';
+    eye.appendChild(pupil);
+    eye.style.top = Math.random()*window.innerHeight + 'px';
+    eye.style.left = Math.random()*window.innerWidth + 'px';
+    document.body.appendChild(eye);
+    eyes.push({eye, pupil});
 }
 document.addEventListener('mousemove',(e)=>{
-  eyes.forEach(o=>{
-    const rect=o.eye.getBoundingClientRect();
-    const eyeX=rect.left+rect.width/2;
-    const eyeY=rect.top+rect.height/2;
-    const dx=e.clientX-eyeX;
-    const dy=e.clientY-eyeY;
-    const angle=Math.atan2(dy,dx);
-    o.pupil.style.transform=`translate(${Math.cos(angle)*3}px,${Math.sin(angle)*3}px)`;
-  });
+    eyes.forEach(o=>{
+        const rect = o.eye.getBoundingClientRect();
+        const eyeX = rect.left + rect.width/2;
+        const eyeY = rect.top + rect.height/2;
+        const dx = e.clientX - eyeX;
+        const dy = e.clientY - eyeY;
+        const angle = Math.atan2(dy, dx);
+        o.pupil.style.transform = `translate(${Math.cos(angle)*3}px,${Math.sin(angle)*3}px)`;
+    });
 });
 
 // 폭발 피 효과
 document.body.addEventListener('click',(e)=>{
-  for(let i=0;i<50;i++){
-    const drop=document.createElement('div'); drop.className='blood-drop';
-    drop.style.top=e.clientY+Math.random()*30-15+'px';
-    drop.style.left=e.clientX+Math.random()*30-15+'px';
-    document.body.appendChild(drop);
-    setTimeout(()=>drop.remove(),4000);
-  }
+    for(let i=0;i<50;i++){
+        const drop = document.createElement('div'); 
+        drop.className = 'blood-drop';
+        drop.style.top = e.clientY + Math.random()*30-15 + 'px';
+        drop.style.left = e.clientX + Math.random()*30-15 + 'px';
+        document.body.appendChild(drop);
+        setTimeout(()=>drop.remove(),4000);
+    }
 });
 
-// 스킨프랙쳐 눈 추가
-const sfHead=document.getElementById('sf-head');
-for(let i=0;i<40;i++){
-  const eye=document.createElement('div'); eye.className='eye';
-  const pupil=document.createElement('div'); pupil.className='pupil';
-  eye.appendChild(pupil); sfHead.appendChild(eye);
-}
-
 // 스킨프랙쳐 상호작용
-const skinfracture=document.getElementById('skinfracture');
+const skinfracture = document.getElementById('skinfracture');
 skinfracture.addEventListener('click',()=>{
-  const name=prompt('스킨프랙쳐를 클릭했습니다. 당신의 이름은?');
-  const gameText=document.getElementById('game-text');
-  if(name){
-    gameText.textContent=`[스킨프랙쳐] ${name}... 내가 너를 지켜보고 있다...`;
-  } else {
-    gameText.textContent='[스킨프랙쳐] 이름이 없군... 너를 주시하고 있다...';
-  }
+    const name = prompt('스킨프랙쳐를 클릭했습니다. 당신의 이름은?');
+    const gameText = document.getElementById('game-text');
+    if(name){
+        gameText.textContent = `[스킨프랙쳐] ${name}... 내가 너를 지켜보고 있다...`;
+    } else {
+        gameText.textContent = '[스킨프랙쳐] 이름이 없군... 너를 주시하고 있다...';
+    }
 });
 
 // 장난감 상호작용
 document.querySelectorAll('.toy').forEach(toy=>{
-  toy.addEventListener('click',()=>{
-    alert('기괴한 장난감이 움직였다!');
-    toy.style.transform = `rotate(${Math.floor(Math.random()*360)}deg) scale(${1+Math.random()})`;
-  });
-  toy.addEventListener('mouseenter',()=>{ toy.style.transform='scale(1.3)'; });
-  toy.addEventListener('mouseleave',()=>{ toy.style.transform='scale(1)'; });
+    toy.addEventListener('click',()=>{
+        alert('기괴한 장난감이 움직였다!');
+        toy.style.transform = `rotate(${Math.floor(Math.random()*360)}deg) scale(${1+Math.random()})`;
+    });
+    toy.addEventListener('mouseenter',()=>{ toy.style.transform='scale(1.3)'; });
+    toy.addEventListener('mouseleave',()=>{ toy.style.transform='scale(1)'; });
 });
 </script>
 </body>
 </html>
-<div class="skinfracture" id="skinfracture">
-  <img src="31201fee-831c-4906-a2cb-da1767db168f8.png" alt="Skin Fracture" style="width:120px; height:auto; image-rendering:pixelated;"/>
-</div>
-
-<div class="toy" id="toy1" style="top:200px; left:300px; background-image:url('teddy_pixel.png'); width:60px; height:60px;"></div>
-<div class="toy" id="toy2" style="top:400px; left:600px; background-image:url('teddy_pixel2.png'); width:60px; height:60px;"></div>
