@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>기괴한 인터랙티브 스토리</title>
+<title>기괴한 스토리 + 그림판</title>
 <style>
 body {
   margin:0;
@@ -61,62 +61,129 @@ body {
   pointer-events:none;
   transition: transform 0.05s linear;
 }
+#pixelCanvas {
+  position:absolute;
+  top:0; left:0;
+  width:100%; height:100%;
+  pointer-events:none;
+  z-index:1;
+}
+#endingScreen {
+  display:none;
+  position:absolute;
+  top:0; left:0;
+  width:100%; height:100%;
+  background-size:cover;
+  background-position:center;
+  z-index:200;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  color:#ff6666;
+  font-size:3em;
+  text-shadow: 2px 2px 5px #000;
+}
+#drawCanvas {
+  display:none;
+  position:absolute;
+  top:0; left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.8);
+  z-index:150;
+  cursor:crosshair;
+}
 </style>
 </head>
 <body>
 
 <!-- 캐릭터 -->
-<img src="https://th.bing.com/th/id/OIP.v7gDDbmx9bBH02zyTS9TkAHaNV?w=115&h=180&c=7&r=0&o=7&pid=1.7&rm=3" class="character" id="skinfracture" style="top:100px; left:200px;" alt="스킨프랙쳐">
+<img src="https://th.bing.com/th/id/OIP.TMhitCckV4-t8vdFnrfw-wHaPA?w=115&h=180&c=7&r=0&o=7&pid=1.7&rm=3" class="character" id="skinfracture" style="top:100px; left:200px;" alt="스킨프랙쳐">
 
 <div id="dialogue"></div>
 
-<!-- 눈 이미지 여러 개 -->
+<!-- 눈 이미지 -->
 <img src="https://th.bing.com/th/id/OIP.wVayDMkk0NSwQOoBIFRzFgHaGS?w=203&h=180&c=7&r=0&o=7&pid=1.7&rm=3" class="eye">
 <img src="https://th.bing.com/th/id/OIP.NFX33A1fNG5thwfx9LrjuwHaEr?w=277&h=180&c=7&r=0&o=7&pid=1.7&rm=3" class="eye">
 
 <!-- 마우스 따라다니는 펫 -->
 <img id="follower" src="https://th.bing.com/th/id/OIP.hO7yEvdPMrjCawk5lJoBLwHaIK?w=159&h=180&c=7&r=0&o=7&pid=1.7&rm=3">
 
+<!-- 픽셀 캔버스 -->
+<canvas id="pixelCanvas"></canvas>
+
+<!-- 그림판 캔버스 -->
+<canvas id="drawCanvas"></canvas>
+
+<!-- 엔딩 화면 -->
+<div id="endingScreen" style="background-image:url('https://i.pinimg.com/736x/48/e8/78/48e878c8235324ce7c4bbbb310253889.jpg');">
+  당신의 인생은 안녕한가?
+</div>
+
 <script>
 const dialogue = document.getElementById('dialogue');
 const eyes = document.querySelectorAll('.eye');
 const follower = document.getElementById('follower');
+const endingScreen = document.getElementById('endingScreen');
+const drawCanvas = document.getElementById('drawCanvas');
+const drawCtx = drawCanvas.getContext('2d');
 
-// 스토리 JSON
+// 캔버스 크기 맞춤
+drawCanvas.width = window.innerWidth;
+drawCanvas.height = window.innerHeight;
+const pixelCanvas = document.getElementById('pixelCanvas');
+const pixelCtx = pixelCanvas.getContext('2d');
+pixelCanvas.width = window.innerWidth;
+pixelCanvas.height = window.innerHeight;
+
+// 스토리 JSON + 그림 그리기 선택지
 const story = {
   skinfracture:{text:"나는 스킨프랙쳐야. 오늘 기괴한 모험을 할래?", choices:[
     {text:"응, 시작하자", next:"adventure1"},
-    {text:"조금 무서워", next:"scared1"},
-    {text:"그냥 관찰만", next:"observe"}
+    {text:"그림 그려주고 싶다", next:"drawStory"},
+    {text:"조금 무서워", next:"scared1"}
   ]},
   adventure1:{text:"좋아! 방 안에 눈들이 너를 지켜보고 있어. 무엇을 할래?", choices:[
     {text:"눈에게 말을 걸어본다", next:"talkEyes"},
     {text:"모험 계속", next:"deepAdventure"},
-    {text:"돌아간다", next:"end"}
+    {text:"돌아간다", next:"endStory"}
   ]},
+  drawStory:{text:"좋아! 스킨프랙쳐에게 그림을 그려줘.", choices:[
+    {text:"그림 그리기 시작", next:"drawCanvasScreen"}
+  ]},
+  drawCanvasScreen:{text:"", choices:[]}, // 실제 그림판 실행
   scared1:{text:"흥, 무서워할 줄 알았어.", choices:[
     {text:"다시 용기내기", next:"adventure1"},
-    {text:"도망가기", next:"end"}
-  ]},
-  observe:{text:"눈들이 조용히 너를 바라보고 있어.", choices:[
-    {text:"모험 시작", next:"adventure1"},
-    {text:"포기", next:"end"}
+    {text:"도망가기", next:"endStory"}
   ]},
   talkEyes:{text:"눈들이 깜빡이며 대답을 한다… “어서 와”", choices:[
     {text:"더 깊이 들어간다", next:"deepAdventure"},
-    {text:"나가기", next:"end"}
+    {text:"나가기", next:"endStory"}
   ]},
   deepAdventure:{text:"방 안이 점점 어두워지고, 기괴한 그림자가 너를 감싼다.", choices:[
-    {text:"계속 전진", next:"end"},
-    {text:"뒤로 돌아간다", next:"end"}
+    {text:"계속 전진", next:"endStory"},
+    {text:"뒤로 돌아간다", next:"endStory"}
   ]},
-  end:{text:"모험이 끝났어. 스킨프랙쳐를 다시 클릭해봐!", choices:[]}
+  endStory:{text:"", choices:[]}
 };
 
-// 캐릭터 클릭
 document.getElementById('skinfracture').addEventListener('click',()=>startStory('skinfracture'));
 
 function startStory(key){
+  if(key==="endStory"){
+    dialogue.style.display="none";
+    drawCanvas.style.display="none";
+    endingScreen.style.display="flex";
+    return;
+  }
+  if(key==="drawCanvasScreen"){
+    dialogue.style.display="none";
+    drawCanvas.style.display="block";
+    enableDrawing();
+    return;
+  }
+
   const node = story[key];
   dialogue.innerHTML = node.text+"<br>";
   dialogue.style.display='block';
@@ -134,10 +201,7 @@ function startStory(key){
 
 // 마우스 움직임
 document.addEventListener('mousemove',(e)=>{
-  // 펫 따라다니기
   follower.style.transform = `translate(${e.clientX-40}px, ${e.clientY-40}px)`;
-
-  // 눈 따라보기
   eyes.forEach(eye=>{
     const rect = eye.getBoundingClientRect();
     const dx = e.clientX-(rect.left+rect.width/2);
@@ -146,13 +210,47 @@ document.addEventListener('mousemove',(e)=>{
   });
 });
 
-// 🔥 불 깜빡임 효과
+// 🔥 불 깜빡임
 function flickerLight(){
   const brightness = 0.6 + Math.random()*0.4;
   document.body.style.background = `rgba(10,10,10,${brightness})`;
   setTimeout(flickerLight, 100 + Math.random()*200);
 }
 flickerLight();
+
+// 🎮 픽셀 효과
+function drawPixels(){
+  pixelCtx.clearRect(0,0,pixelCanvas.width,pixelCanvas.height);
+  for(let i=0;i<500;i++){
+    const x = Math.random()*pixelCanvas.width;
+    const y = Math.random()*pixelCanvas.height;
+    const size = Math.random()*2+1;
+    const color = `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},0.5)`;
+    pixelCtx.fillStyle=color;
+    pixelCtx.fillRect(x,y,size,size);
+  }
+  requestAnimationFrame(drawPixels);
+}
+drawPixels();
+
+// 🎨 그림 그리기 기능
+function enableDrawing(){
+  let painting=false;
+  drawCanvas.addEventListener('mousedown',(e)=>{painting=true; drawCtx.beginPath(); drawCtx.moveTo(e.clientX,e.clientY);});
+  drawCanvas.addEventListener('mouseup',(e)=>{painting=false;});
+  drawCanvas.addEventListener('mousemove',(e)=>{
+    if(!painting) return;
+    drawCtx.strokeStyle='white';
+    drawCtx.lineWidth=4;
+    drawCtx.lineTo(e.clientX,e.clientY);
+    drawCtx.stroke();
+  });
+  // 종료 클릭 시 엔딩
+  drawCanvas.addEventListener('dblclick',()=>{
+    drawCanvas.style.display="none";
+    startStory('endStory');
+  });
+}
 </script>
 </body>
 </html>
